@@ -8,7 +8,7 @@ export default function Hero( {tree} ) {
         <p>{tree.treeAge}</p>
         <span>{tree.createdAt}</span>
         <div className="card-actions justify-end">
-          <Link to={{pathname: `tree/${tree._id}`}} state={{ tree: tree }} className="btn btn-primary">Visit Tree</Link>
+          <Link to={{pathname: `tree/${tree._id}`}} state={{ tree: tree }} className="btn">Visit Tree</Link>
         </div>
       </div>
     </div>
