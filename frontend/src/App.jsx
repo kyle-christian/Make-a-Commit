@@ -1,14 +1,38 @@
-import { useState } from 'react'
-import Hero from './hero'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+
+// pages and components
+import Home from './pages/Home'
+import Profile from './pages/Profile'
+import About from './pages/About'
+import Tree from './pages/Tree'
+import Navbar from './components/navbar'
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
     <div className="App">
-      <Hero />
-      <h1>Make a commit.</h1>
-      <button>Raise count</button>
+      <BrowserRouter>
+        <Navbar />
+        <div className="pages">
+          <Routes>
+            <Route
+              path="/"
+              element={<Home />}
+            />
+            <Route
+              path="/profile"
+              element={<Profile />}
+            />
+            <Route
+              path="/about"
+              element={<About />}
+            />
+            <Route
+              path="profile/tree/:id"
+              element={<Tree />}
+            />
+          </Routes>
+        </div>
+      </BrowserRouter>
     </div>
   )
 }
