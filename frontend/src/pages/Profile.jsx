@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import TreeCard from "../components/treeCard";
+import CommitForm from "../components/commitForm"
 
 const Profile = () => {
   const [trees, setTrees] = useState([]);
@@ -18,10 +19,13 @@ const Profile = () => {
   }, []);
 
   return (
-    <div className="flex justify-around">
-      {trees.map((tree) => {
-        return <TreeCard key={tree._id} tree={tree} />;
-      })}
+    <div className="page">
+      <div className="flex flex-wrap justify-center gap-4 mt-4">
+        {trees.map((tree) => {
+          return <TreeCard key={tree._id} tree={tree} />;
+        })}
+        {trees.length < 3 ? <CommitForm /> : <span className="text-center w-full">Please complete or delete these trees before starting another one.</span>}
+      </div>
     </div>
   );
 };

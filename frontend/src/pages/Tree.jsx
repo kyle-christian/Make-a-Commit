@@ -8,8 +8,14 @@ export default function Tree() {
   //tree generation
   useEffect(() => {
     const canvas = document.querySelector("canvas");
-    canvas.width = 1000;
-    canvas.height = 1000;
+    if (tree.treeAge > 200) {
+      canvas.width = 1400;
+      canvas.height = 1400;
+    } else {
+      canvas.width = 900;
+      canvas.height = 900;
+    }
+
     const ctx = canvas.getContext("2d");
 
     function drawTree(startX, startY, len, angle, branchWidth, color1, color2) {
@@ -27,8 +33,8 @@ export default function Tree() {
         ctx.restore();
         return;
       }
-      drawTree(0, -len, len * 0.8, angle + 8, branchWidth * 0.7);
-      drawTree(0, -len, len * 0.8, angle - 8, branchWidth * 0.7);
+      drawTree(0, -len, len * 0.78, angle + 8, branchWidth * 0.7);
+      drawTree(0, -len, len * 0.78, angle - 8, branchWidth * 0.7);
       ctx.restore();
     }
 
@@ -44,9 +50,10 @@ export default function Tree() {
   }, []);
 
   return (
-    <div className="h-screen flex flex-col justify-center items-center">
-      <h1>{tree.title}</h1>
+    <div className="flex flex-col justify-center items-center">
       <canvas></canvas>
+      <h1>{tree.title}</h1>
+      <h2>{tree.treeAge}</h2>
     </div>
   );
 }
