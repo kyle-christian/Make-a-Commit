@@ -3,16 +3,25 @@
 @tailwind utilities;
 
 .page {
-  max-width: 1440px;
+  max-width: 1200px;
+  min-height: 80vh;
   margin: 0 auto;
+  padding: 2rem 2rem;
   display: flex;
   flex-direction: column;
 }
 
 canvas {
   /* background: black; */
+  margin: 2rem;
   width: 600px;
   height: 600px;
+  border-bottom: #5c7f67 2px solid;
+}
+
+.main-height: {
+  height: 100vh;
+  background: black;
 }
 
 /* :root {

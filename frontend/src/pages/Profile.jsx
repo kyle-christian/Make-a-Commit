@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import TreeCard from "../components/treeCard";
 import CommitForm from "../components/commitForm"
+import ProfileHeader from "../components/profileHeader"
 
 const Profile = () => {
   const [trees, setTrees] = useState([]);
@@ -20,7 +21,10 @@ const Profile = () => {
 
   return (
     <div className="page">
+      <ProfileHeader />
+
       <div className="flex flex-wrap justify-center gap-4 mt-4">
+
         {trees.map((tree) => {
           return <TreeCard key={tree._id} tree={tree} />;
         })}

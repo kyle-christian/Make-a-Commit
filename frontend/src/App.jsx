@@ -6,6 +6,7 @@ import Profile from './pages/Profile'
 import About from './pages/About'
 import Tree from './pages/Tree'
 import Navbar from './components/navbar'
+import Footer from './components/footer'
 
 function App() {
   return (
@@ -32,6 +33,7 @@ function App() {
             />
           </Routes>
         </div>
+        <Footer />
       </BrowserRouter>
     </div>
   )
