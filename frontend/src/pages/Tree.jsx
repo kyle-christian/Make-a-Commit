@@ -1,42 +1,70 @@
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
-export default function Tree() {
+export default function Tree() { 
   const location = useLocation();
   const { tree } = location.state;
 
   const [commitMessage, setCommitMessage] = useState({
-    message: ""
-  })
+    message: "",
+  });
 
-  const [error, setError] = useState(null)
+  const [error, setError] = useState(null);
 
   //form handler
 
   const handleChange = (event) => {
-    setCommitMessage({ [event.target.name]: event.target.value })
-    const commitCheck = "i commit -m"
-    const commitCheckMessage = commitMessage.message.split(' ').splice(0, 3).join(' ');
+    setCommitMessage({ [event.target.name]: event.target.value });
+  };
+
+  // useEffect for errorhandler
+
+  useEffect(() => {
+    if (!commitMessage.message) {
+      return
+    }
+    const commitCheck = "i commit -m";
+    const commitCheckMessage = commitMessage.message
+      .split(" ")
+      .splice(0, 3)
+      .join(" ");
 
     if (commitCheckMessage != commitCheck) {
-      setError(`Please input "i commit -m "`)
-      document.getElementById("checker").classList.add("input-error")
+      setError(`Please input "i commit -m"`);
+      document.getElementById("checker").classList.add("input-error");
     } else {
-      setError("")
-      document.getElementById("checker").classList.remove("input-error")
+      setError("");
+      document.getElementById("checker").classList.remove("input-error");
     }
-  }
+  }, [commitMessage])
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(commitMessage.message)
-  }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (error) {
+      return setError('Make sure "i commit -m" is exact!')
+    }
+
+    console.log(commitMessage.message + " " + tree._id);
+
+    const response = await fetch("http://localhost:4000/api/trees/" + tree._id, {
+      method: "PATCH",
+      body: JSON.stringify(tree),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const json = await response.json();
+
+    window.location.reload();
+    console.log(json)
+  };
 
   //error click handler
 
   const handleClick = () => {
-    setError(null)
-  }
+    setError(null);
+  };
 
   //tree generation
   useEffect(() => {
@@ -90,7 +118,6 @@ export default function Tree() {
         <p>{tree.treeAge}</p>
       </article>
 
-      
       <form className="mt-4" onSubmit={handleSubmit}>
         <input
           id="checker"
@@ -101,8 +128,11 @@ export default function Tree() {
           name="message"
         />
 
-{error && (
-          <div className="alert alert-error shadow-lg mt-4 cursor-pointer" onClick={handleClick}>
+        {error && (
+          <div
+            className="alert alert-error shadow-lg mt-4 cursor-pointer"
+            onClick={handleClick}
+          >
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -122,8 +152,6 @@ export default function Tree() {
           </div>
         )}
       </form>
-
-      
     </div>
   );
 }

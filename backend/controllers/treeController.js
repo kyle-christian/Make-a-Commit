@@ -48,36 +48,39 @@ module.exports = {
   },
 
   deleteTree: async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(404).json({ error: "Not a valid ID" });
     }
 
-    const tree = await Tree.findOneAndDelete({_id: id})
+    const tree = await Tree.findOneAndDelete({ _id: id });
 
     if (!tree) {
       return res.status(404).json({ error: "Could not find tree" });
     }
 
-    res.status(200).json(tree)
+    res.status(200).json(tree);
   },
 
   updateTree: async (req, res) => {
-    const { id } = req.params
+    const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(404).json({error: "Not a valid ID"})
+      return res.status(404).json({ error: "Not a valid ID" });
     }
 
-    const tree = await Tree.findOneAndUpdate({_id: id}, {
-        ...req.body
-    })
+    const tree = await Tree.findOneAndUpdate(
+      { _id: id },
+      {
+        $inc: { treeAge: 2 },
+      }
+    );
 
     if (!tree) {
-        return res.status(404).json({ error: "Could not find tree" });
+      return res.status(404).json({ error: "Could not find tree" });
     }
 
-    res.status(200).json(tree)
-  }
+    res.status(200).json(tree);
+  },
 };
