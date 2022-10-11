@@ -1,15 +1,46 @@
 import { useLocation } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, createRef } from "react";
+import { isEqual, parseISO, format } from "date-fns";
 
-export default function Tree() { 
+export default function Tree() {
   const location = useLocation();
   const { tree } = location.state;
+
+  //importing tree data again as page won't reflect new treeAge on reload unless I use context
+
+  const [trees, setTrees] = useState({});
+
+  useEffect(() => {
+    const fetchTrees = async () => {
+      const response = await fetch(
+        "http://localhost:4000/api/trees/" + tree._id
+      );
+      const json = await response.json();
+
+      if (response.ok) {
+        setTrees(json);
+      }
+    };
+
+    fetchTrees();
+  }, []);
 
   const [commitMessage, setCommitMessage] = useState({
     message: "",
   });
 
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+  //push button
+
+  const [push, setPush] = useState(true);
+  const pushButton = createRef();
+
+  function testingFunction() {
+    console.log("click");
+    pushButton.current.disabled = "true";
+  }
 
   //form handler
 
@@ -20,8 +51,10 @@ export default function Tree() {
   // useEffect for errorhandler
 
   useEffect(() => {
+    pushButton.current.disabled = push;
+
     if (!commitMessage.message) {
-      return
+      return;
     }
     const commitCheck = "i commit -m";
     const commitCheckMessage = commitMessage.message
@@ -31,33 +64,38 @@ export default function Tree() {
 
     if (commitCheckMessage != commitCheck) {
       setError(`Please input "i commit -m"`);
-      document.getElementById("checker").classList.add("input-error");
+      setPush(true);
+      document.getElementById("checker").classList.add("input-warning");
     } else {
       setError("");
-      document.getElementById("checker").classList.remove("input-error");
+      setPush(false);
+      document.getElementById("checker").classList.remove("input-warning");
     }
-  }, [commitMessage])
+  }, [commitMessage]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (error) {
-      return setError('Make sure "i commit -m" is exact!')
+      document.getElementById("submit-error").classList.add("alert-error");
+      return setError('Make sure "i commit -m" is exact!');
     }
 
-    console.log(commitMessage.message + " " + tree._id);
-
-    const response = await fetch("http://localhost:4000/api/trees/" + tree._id, {
-      method: "PATCH",
-      body: JSON.stringify(tree),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await fetch(
+      "http://localhost:4000/api/trees/" + tree._id,
+      {
+        method: "PATCH",
+        body: JSON.stringify(tree),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const json = await response.json();
 
     window.location.reload();
-    console.log(json)
+    setSuccess(!success);
+    console.log(json);
   };
 
   //error click handler
@@ -110,27 +148,50 @@ export default function Tree() {
     );
   }, []);
 
+  //date checker
+  useEffect(() => {
+    const todaysDate = format(new Date(), "MM/dd/yyyy");
+    const updatedDate = format(new Date(tree.updatedAt), "MM/dd/yyyy");
+    const createdAt = format(new Date(tree.createdAt), "MM/dd/yyyy");
+
+    console.log(`${todaysDate} | ${updatedDate} | ${createdAt}`);
+
+    if (todaysDate === updatedDate) {
+      document.querySelector("#checker").disabled = "true";
+      setSuccess(true);
+    }
+  }, []);
+
   return (
     <div className="page flex flex-col justify-center items-center">
       <canvas></canvas>
       <article className="prose text-center">
         <h1>{tree.title}</h1>
-        <p>{tree.treeAge}</p>
+        <p>{trees.treeAge}</p>
       </article>
 
       <form className="mt-4" onSubmit={handleSubmit}>
-        <input
-          id="checker"
-          type="text"
-          placeholder='i commit -m "your message"'
-          className="input input-ghost w-full max-w-xs"
-          onChange={handleChange}
-          name="message"
-        />
+        <span>your messages will never be saved.</span>
+        <div className="flex">
+          <input
+            id="checker"
+            type="text"
+            placeholder='i commit -m "your message"'
+            className="input input-ghost w-full max-w-xs"
+            onChange={handleChange}
+            name="message"
+            autoComplete="off"
+          />
+
+          <button ref={pushButton} className="btn btn-primary ml-2">
+            push!
+          </button>
+        </div>
 
         {error && (
           <div
-            className="alert alert-error shadow-lg mt-4 cursor-pointer"
+            id="submit-error"
+            className="alert alert-warning shadow-lg mt-4 cursor-pointer"
             onClick={handleClick}
           >
             <div>
@@ -151,7 +212,41 @@ export default function Tree() {
             </div>
           </div>
         )}
+
+        {success && (
+          <div className="alert alert-success shadow-lg mt-4">
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="stroke-current flex-shrink-0 h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                />
+              </svg>
+              <span>Commit pushed!</span>
+            </div>
+          </div>
+        )}
       </form>
+
+      <div className="card w-4/5 bg-base-100 shadow-xl">
+        <figure>
+          <canvas></canvas>
+        </figure>
+        <div className="card-body">
+          <h2 className="card-title">Shoes!</h2>
+          <p>If a dog chews shoes whose shoes does he choose?</p>
+          <div className="card-actions justify-end">
+            <button className="btn btn-primary">Buy Now</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
